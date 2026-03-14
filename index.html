@@ -6,40 +6,45 @@
     <title>WanderSiam - Internal Purchase Request</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; color: #333; }
+        /* สไตล์หลักสำหรับหน้าจอ */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; color: #333; font-size: 14px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0056b3; padding-bottom: 15px; margin-bottom: 25px; }
-        .logo-img { max-width: 250px; }
-        .header-title h2 { margin: 0; color: #0056b3; text-align: right; }
         
-        .info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .header-section { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0056b3; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo-box { width: 50%; }
+        .logo-img { max-width: 220px; margin-bottom: 5px; }
+        .company-info { font-size: 12px; color: #555; line-height: 1.4; }
+        .header-title { width: 50%; text-align: right; }
+        .header-title h2 { margin: 0; color: #0056b3; font-size: 24px; padding-top: 10px; }
+        
+        .info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .info-group { display: flex; align-items: center; }
-        .info-group label { width: 110px; font-weight: bold; font-size: 14px; color: #555; }
-        .info-group input, .info-group select { flex: 1; padding: 6px; border: 1px solid transparent; border-bottom: 1px dashed #ccc; font-size: 15px; background: transparent; outline: none; transition: 0.3s; }
+        .info-group label { width: 110px; font-weight: bold; font-size: 13px; color: #555; }
+        .info-group input, .info-group select { flex: 1; padding: 4px 6px; border: 1px solid transparent; border-bottom: 1px dashed #ccc; font-size: 14px; background: transparent; outline: none; transition: 0.3s; }
         .info-group input:focus, .info-group select:focus { border-bottom: 1px solid #0056b3; background: #f8f9fa; }
         
         table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-        th { background-color: #f8f9fa; font-weight: bold; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f8f9fa; font-weight: bold; font-size: 13px; }
         td:nth-child(2) { text-align: left; }
-        input[type="text"].item-name, input[type="number"] { width: 95%; padding: 6px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"].item-name, input[type="number"] { width: 95%; padding: 4px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
         input[type="text"].item-name:focus, input[type="number"]:focus { border: 1px solid #0056b3; outline: none; }
         
         .summary-box { width: 40%; float: right; margin-bottom: 20px; }
         .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        .summary-table td { border: 1px solid #ddd; padding: 6px 8px; text-align: right; font-size: 13px; }
         .summary-table td:first-child { font-weight: bold; background-color: #f8f9fa; width: 60%; }
-        .summary-table .grand-total { font-size: 18px; color: #0056b3; font-weight: bold; }
+        .summary-table .grand-total { font-size: 16px; color: #0056b3; font-weight: bold; }
         
         .clearfix::after { content: ""; clear: both; display: table; }
 
-        .btn-add { background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 20px; float: left; }
+        .btn-add { background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-bottom: 15px; float: left; }
         .btn-add:hover { background: #5a6268; }
-        .btn-del { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .btn-del { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
         .btn-del:hover { background: #c82333; }
 
-        .button-group { display: flex; gap: 15px; margin-top: 30px; clear: both; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; color: white; transition: 0.2s; }
+        .button-group { display: flex; gap: 15px; margin-top: 20px; clear: both; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; color: white; transition: 0.2s; }
         .btn-print { background: #4b5563; }
         .btn-print:hover { background: #374151; }
         .btn-excel { background: #1D6F42; } 
@@ -47,19 +52,43 @@
         .btn-submit { background: #0056b3; } 
         .btn-submit:hover { background: #004494; }
 
-        .signature-section { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; clear: both; }
-        .sign-box { width: 30%; }
-        .sign-line { border-bottom: 1px dotted #333; height: 50px; margin-bottom: 10px; }
-        .sign-name { font-weight: bold; margin-bottom: 5px; }
+        .signature-section { display: flex; justify-content: space-between; margin-top: 30px; text-align: center; clear: both; }
+        .sign-box { width: 32%; font-size: 13px; }
+        .sign-line { border-bottom: 1px dotted #333; height: 40px; margin-bottom: 8px; }
+        .sign-name { font-weight: bold; margin-bottom: 4px; white-space: nowrap; }
 
+        /* สไตล์สำหรับตอนสั่ง Print (บีบอัดพื้นที่ให้ลง A4 ได้เยอะที่สุด) */
         @media print {
-            @page { size: A4; margin: 15mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; }
+            @page { size: A4; margin: 10mm; } /* ลดขอบกระดาษเหลือ 1 ซม. */
+            body { background: white; padding: 0; font-size: 12px; -webkit-print-color-adjust: exact; }
             .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
+            
+            /* ซ่อนปุ่มต่างๆ */
             .button-group, .btn-add, .action-col, .action-cell { display: none !important; }
-            input, select { border: none !important; background: transparent !important; appearance: none; -moz-appearance: none; -webkit-appearance: none; padding: 0; margin: 0; color: #000; font-family: inherit; }
+            
+            /* ปรับระยะห่างให้ชิดขึ้น */
+            .header-section { margin-bottom: 10px; padding-bottom: 5px; }
+            .header-title h2 { font-size: 20px; }
+            .company-info { font-size: 11px; }
+            .info-section { margin-bottom: 10px; gap: 6px; }
+            .info-group label { width: 90px; font-size: 11px; }
+            
+            /* ถอดกล่อง input ออกให้กลายเป็นตัวอักษรพิมพ์ธรรมดา */
+            input, select { border: none !important; background: transparent !important; appearance: none; -moz-appearance: none; -webkit-appearance: none; padding: 0; margin: 0; color: #000; font-family: inherit; font-size: 11px; }
+            
+            /* ปรับตาราง */
+            table { margin-bottom: 5px; }
             table, th, td { border: 1px solid #000; }
-            th { background-color: #e5e7eb !important; }
+            th { background-color: #e5e7eb !important; font-size: 11px; padding: 4px; }
+            td { padding: 4px !important; font-size: 11px; }
+            
+            .summary-box { width: 45%; margin-bottom: 10px; }
+            .summary-table td { padding: 4px; font-size: 11px; }
+            .summary-table .grand-total { font-size: 13px; }
+            
+            .signature-section { margin-top: 25px; }
+            .sign-box { font-size: 11px; }
+            .sign-line { height: 35px; }
         }
     </style>
 </head>
@@ -67,7 +96,15 @@
 
 <div class="container">
     <div class="header-section">
-        <img src="https://wandersiam.com/wp-content/uploads/2023/03/logowandersiam.svg" alt="WanderSiam Logo" class="logo-img">
+        <div class="logo-box">
+            <img src="https://wandersiam.com/wp-content/uploads/2023/03/logowandersiam.svg" alt="WanderSiam Logo" class="logo-img">
+            <div class="company-info">
+                459/1 ถนนเจ้าคำรพ แขวงป้อมปราบ<br>
+                เขตป้อมปราบศัตรูพ่าย กรุงเทพมหานคร 10100<br>
+                Phone: +66 99-354-4046<br>
+                Email: tour@wandersiam.com
+            </div>
+        </div>
         <div class="header-title">
             <h2>ใบขออนุมัติจัดซื้อ (PR)</h2>
         </div>
@@ -184,7 +221,7 @@
         </div>
         <div class="sign-box">
             <div class="sign-line"></div>
-            <div class="sign-name">( ..................................................... )</div>
+            <div class="sign-name">( ......................................... )</div>
             <div>ฝ่ายบัญชี/การเงิน</div>
         </div>
         <div class="sign-box">
@@ -205,10 +242,10 @@
     document.getElementById('requestDate').valueAsDate = new Date();
 
     document.getElementById('requesterName').addEventListener('input', function() {
-        document.getElementById('signRequesterDisplay').innerText = this.value || '.............................................';
+        document.getElementById('signRequesterDisplay').innerText = this.value || '.........................................';
     });
     document.getElementById('approverName').addEventListener('input', function() {
-        document.getElementById('signApproverDisplay').innerText = this.value || '.............................................';
+        document.getElementById('signApproverDisplay').innerText = this.value || '.........................................';
     });
 
     function calcTotal() {
@@ -331,7 +368,6 @@
         alert("ตรวจสอบ Payload ที่รองรับระบบบัญชีใน Console ได้เลยครับ");
     }
 
-    // เรียกคำนวณครั้งแรกเมื่อโหลดหน้า
     window.onload = calcTotal;
 </script>
 
