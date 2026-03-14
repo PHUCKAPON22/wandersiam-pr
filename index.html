@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderSiam - Internal Purchase Request</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0056b3; padding-bottom: 15px; margin-bottom: 25px; }
+        .logo-img { max-width: 250px; }
+        .header-title h2 { margin: 0; color: #0056b3; text-align: right; }
+        
+        .info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .info-group { display: flex; align-items: center; }
+        .info-group label { width: 110px; font-weight: bold; font-size: 14px; color: #555; }
+        .info-group input, .info-group select { flex: 1; padding: 6px; border: 1px solid transparent; border-bottom: 1px dashed #ccc; font-size: 15px; background: transparent; outline: none; transition: 0.3s; }
+        .info-group input:focus, .info-group select:focus { border-bottom: 1px solid #0056b3; background: #f8f9fa; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        td:nth-child(2) { text-align: left; }
+        input[type="text"].item-name, input[type="number"] { width: 95%; padding: 6px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"].item-name:focus, input[type="number"]:focus { border: 1px solid #0056b3; outline: none; }
+        
+        .summary-box { width: 40%; float: right; margin-bottom: 20px; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        .summary-table td:first-child { font-weight: bold; background-color: #f8f9fa; width: 60%; }
+        .summary-table .grand-total { font-size: 18px; color: #0056b3; font-weight: bold; }
+        
+        .clearfix::after { content: ""; clear: both; display: table; }
+
+        .btn-add { background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 20px; float: left; }
+        .btn-add:hover { background: #5a6268; }
+        .btn-del { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .btn-del:hover { background: #c82333; }
+
+        .button-group { display: flex; gap: 15px; margin-top: 30px; clear: both; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-print { background: #4b5563; }
+        .btn-print:hover { background: #374151; }
+        .btn-excel { background: #1D6F42; } 
+        .btn-excel:hover { background: #144c2d; }
+        .btn-submit { background: #0056b3; } 
+        .btn-submit:hover { background: #004494; }
+
+        .signature-section { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; clear: both; }
+        .sign-box { width: 30%; }
+        .sign-line { border-bottom: 1px dotted #333; height: 50px; margin-bottom: 10px; }
+        .sign-name { font-weight: bold; margin-bottom: 5px; }
+
+        @media print {
+            @page { size: A4; margin: 15mm; }
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; margin: 0; }
+            .button-group, .btn-add, .action-col, .action-cell { display: none !important; }
+            input, select { border: none !important; background: transparent !important; appearance: none; -moz-appearance: none; -webkit-appearance: none; padding: 0; margin: 0; color: #000; font-family: inherit; }
+            table, th, td { border: 1px solid #000; }
+            th { background-color: #e5e7eb !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <img src="https://wandersiam.com/wp-content/uploads/2023/03/logowandersiam.svg" alt="WanderSiam Logo" class="logo-img">
+        <div class="header-title">
+            <h2>ใบขออนุมัติจัดซื้อ (PR)</h2>
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <div class="info-group">
+            <label>เลขที่เอกสาร:</label>
+            <input type="text" id="docNumber" value="PR-20260314-001">
+        </div>
+        <div class="info-group">
+            <label>วันที่:</label>
+            <input type="date" id="requestDate">
+        </div>
+        <div class="info-group">
+            <label>ผู้ขออนุมัติ:</label>
+            <input type="text" id="requesterName" value="Phuk (IT Automation)">
+        </div>
+        <div class="info-group">
+            <label>แผนก:</label>
+            <input type="text" id="department" value="IT Support">
+        </div>
+        <div class="info-group">
+            <label>ร้านค้า (Vendor):</label>
+            <input type="text" id="vendorName" value="Shopee / ตัวแทนจำหน่าย IT">
+        </div>
+        <div class="info-group">
+            <label>การคิดภาษี:</label>
+            <select id="vatType" onchange="calcTotal()">
+                <option value="exclude">ยังไม่รวม VAT (บวกเพิ่ม 7%)</option>
+                <option value="include">รวม VAT 7% แล้ว (ถอดแวต)</option>
+                <option value="none">ไม่มี VAT</option>
+            </select>
+        </div>
+        <div class="info-group">
+            <label>ผู้อนุมัติ:</label>
+            <input type="text" id="approverName" value="CEO">
+        </div>
+        <div class="info-group">
+            <label>สถานะ:</label>
+            <select id="status">
+                <option value="Draft">Draft</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+            </select>
+        </div>
+    </div>
+
+    <table id="prTable">
+        <thead>
+            <tr>
+                <th width="5%">ลำดับ</th>
+                <th width="40%">รายการสินค้า (Description)</th>
+                <th width="15%">จำนวน</th>
+                <th width="15%">ราคา/หน่วย</th>
+                <th width="15%">จำนวนเงิน</th>
+                <th width="10%" class="action-col">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="row-num">1</td>
+                <td><input type="text" class="item-name" value="Jabra Speak 510 MS (Speakerphone)"></td>
+                <td><input type="number" class="qty" value="1" min="1" onchange="calcTotal()"></td>
+                <td><input type="number" class="price" value="3906" min="0" onchange="calcTotal()"></td>
+                <td><span class="row-total">3906.00</span></td>
+                <td class="action-cell"><button class="btn-del" onclick="deleteRow(this)">ลบ</button></td>
+            </tr>
+            <tr>
+                <td class="row-num">2</td>
+                <td><input type="text" class="item-name" value="SAMSUNG 55' Crystal UHD UE100F 4K"></td>
+                <td><input type="number" class="qty" value="1" min="1" onchange="calcTotal()"></td>
+                <td><input type="number" class="price" value="12990" min="0" onchange="calcTotal()"></td>
+                <td><span class="row-total">12990.00</span></td>
+                <td class="action-cell"><button class="btn-del" onclick="deleteRow(this)">ลบ</button></td>
+            </tr>
+            <tr>
+                <td class="row-num">3</td>
+                <td><input type="text" class="item-name" value="UGREEN HDMI 4K/60Hz"></td>
+                <td><input type="number" class="qty" value="1" min="1" onchange="calcTotal()"></td>
+                <td><input type="number" class="price" value="171" min="0" onchange="calcTotal()"></td>
+                <td><span class="row-total">171.00</span></td>
+                <td class="action-cell"><button class="btn-del" onclick="deleteRow(this)">ลบ</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="clearfix">
+        <button class="btn-add" onclick="addRow()">+ เพิ่มรายการสินค้า</button>
+        
+        <div class="summary-box">
+            <table class="summary-table">
+                <tr>
+                    <td>รวมเป็นเงิน (Subtotal):</td>
+                    <td><span id="subTotal">0.00</span></td>
+                </tr>
+                <tr>
+                    <td>ภาษีมูลค่าเพิ่ม 7% (VAT):</td>
+                    <td><span id="vatAmount">0.00</span></td>
+                </tr>
+                <tr>
+                    <td>ยอดรวมสุทธิ (Grand Total):</td>
+                    <td class="grand-total"><span id="grandTotal">0.00</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-name">( <span id="signRequesterDisplay">Phuk (IT Automation)</span> )</div>
+            <div>ผู้ขอจัดซื้อ</div>
+        </div>
+        <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-name">( ..................................................... )</div>
+            <div>ฝ่ายบัญชี/การเงิน</div>
+        </div>
+        <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-name">( <span id="signApproverDisplay">CEO</span> )</div>
+            <div>ผู้อนุมัติ (ผู้มีอำนาจลงนาม)</div>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button class="btn btn-print" onclick="window.print()">🖨️ พรีวิว & พิมพ์ (A4)</button>
+        <button class="btn btn-excel" onclick="exportToExcel()">📥 ดาวน์โหลด Excel</button>
+        <button class="btn btn-submit" onclick="submitToAutomation()">🚀 ส่งเข้าสู่ระบบ (JSON)</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('requestDate').valueAsDate = new Date();
+
+    document.getElementById('requesterName').addEventListener('input', function() {
+        document.getElementById('signRequesterDisplay').innerText = this.value || '.............................................';
+    });
+    document.getElementById('approverName').addEventListener('input', function() {
+        document.getElementById('signApproverDisplay').innerText = this.value || '.............................................';
+    });
+
+    function calcTotal() {
+        let rawTotal = 0;
+        const rows = document.querySelectorAll('#prTable tbody tr');
+        rows.forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').innerText = total.toFixed(2);
+            rawTotal += total;
+        });
+
+        const vatType = document.getElementById('vatType').value;
+        let subTotal = 0;
+        let vatAmount = 0;
+        let grandTotal = 0;
+
+        if (vatType === 'exclude') {
+            subTotal = rawTotal;
+            vatAmount = subTotal * 0.07;
+            grandTotal = subTotal + vatAmount;
+        } else if (vatType === 'include') {
+            subTotal = rawTotal / 1.07;
+            vatAmount = rawTotal - subTotal;
+            grandTotal = rawTotal;
+        } else {
+            subTotal = rawTotal;
+            vatAmount = 0;
+            grandTotal = rawTotal;
+        }
+
+        document.getElementById('subTotal').innerText = subTotal.toFixed(2);
+        document.getElementById('vatAmount').innerText = vatAmount.toFixed(2);
+        document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+    }
+
+    function addRow() {
+        const tbody = document.querySelector('#prTable tbody');
+        const rowCount = tbody.querySelectorAll('tr').length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="row-num">${rowCount}</td>
+            <td><input type="text" class="item-name" value=""></td>
+            <td><input type="number" class="qty" value="1" min="1" onchange="calcTotal()"></td>
+            <td><input type="number" class="price" value="0" min="0" onchange="calcTotal()"></td>
+            <td><span class="row-total">0.00</span></td>
+            <td class="action-cell"><button class="btn-del" onclick="deleteRow(this)">ลบ</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function deleteRow(btn) {
+        btn.closest('tr').remove();
+        document.querySelectorAll('#prTable tbody tr').forEach((r, index) => { r.querySelector('.row-num').innerText = index + 1; });
+        calcTotal();
+    }
+
+    function exportToExcel() {
+        let ws_data = [
+            ["WANDERSIAM - ใบขออนุมัติจัดซื้ออุปกรณ์ (Internal PR)"],
+            [], 
+            ["เลขที่เอกสาร:", document.getElementById('docNumber').value, "วันที่:", document.getElementById('requestDate').value],
+            ["ผู้ขออนุมัติ:", document.getElementById('requesterName').value, "ผู้อนุมัติ:", document.getElementById('approverName').value],
+            ["แผนก:", document.getElementById('department').value, "ร้านค้า (Vendor):", document.getElementById('vendorName').value],
+            ["สถานะ:", document.getElementById('status').value],
+            [],
+            ["ลำดับ", "รายการสินค้า (Description)", "จำนวน", "ราคา/หน่วย", "จำนวนเงิน"]
+        ];
+
+        document.querySelectorAll('#prTable tbody tr').forEach((row, index) => {
+            const desc = row.querySelector('.item-name').value;
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = parseFloat(row.querySelector('.row-total').innerText) || 0;
+            if (desc.trim() !== "") ws_data.push([index + 1, desc, qty, price, total]);
+        });
+
+        ws_data.push(["", "", "", "รวมเป็นเงิน (Subtotal):", parseFloat(document.getElementById('subTotal').innerText)]);
+        ws_data.push(["", "", "", "ภาษีมูลค่าเพิ่ม 7% (VAT):", parseFloat(document.getElementById('vatAmount').innerText)]);
+        ws_data.push(["", "", "", "ยอดรวมสุทธิ (Grand Total):", parseFloat(document.getElementById('grandTotal').innerText)]);
+
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "PR");
+        XLSX.writeFile(wb, "PR_" + document.getElementById('docNumber').value + ".xlsx");
+    }
+
+    function submitToAutomation() {
+        const payload = {
+            docNumber: document.getElementById('docNumber').value,
+            requestDate: document.getElementById('requestDate').value,
+            requester: document.getElementById('requesterName').value,
+            department: document.getElementById('department').value,
+            vendorName: document.getElementById('vendorName').value,
+            vatType: document.getElementById('vatType').value,
+            approver: document.getElementById('approverName').value,
+            status: document.getElementById('status').value,
+            items: [],
+            summary: {
+                subTotal: parseFloat(document.getElementById('subTotal').innerText),
+                vatAmount: parseFloat(document.getElementById('vatAmount').innerText),
+                grandTotal: parseFloat(document.getElementById('grandTotal').innerText)
+            }
+        };
+
+        document.querySelectorAll('#prTable tbody tr').forEach(row => {
+            const desc = row.querySelector('.item-name').value;
+            if (desc.trim() !== "") {
+                payload.items.push({
+                    description: desc,
+                    quantity: parseFloat(row.querySelector('.qty').value),
+                    unitPrice: parseFloat(row.querySelector('.price').value),
+                    totalPrice: parseFloat(row.querySelector('.row-total').innerText)
+                });
+            }
+        });
+
+        console.log("JSON Payload Prepared:", JSON.stringify(payload, null, 2));
+        alert("ตรวจสอบ Payload ที่รองรับระบบบัญชีใน Console ได้เลยครับ");
+    }
+
+    // เรียกคำนวณครั้งแรกเมื่อโหลดหน้า
+    window.onload = calcTotal;
+</script>
+
+</body>
+</html>
